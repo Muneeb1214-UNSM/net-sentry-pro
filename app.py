@@ -1,150 +1,108 @@
-import streamlit as st
+ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
-import time
-import random
 from streamlit_lottie import st_lottie
 import requests
+import time
+import random
 
-# --- FUTURISTIC CONFIG ---
-st.set_page_config(page_title="VortexAI Forensics", layout="wide", page_icon="🌀")
+# --- SETTING UP MODERN THEME ---
+st.set_page_config(page_title="NetGuard AI", layout="wide", page_icon="🛡️")
 
-# --- ULTRA-MODERN CSS (Cyber-Terminal Look) ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500&display=swap');
-    .stApp { background: #020205; color: #00e5ff; font-family: 'Fira Code', monospace; }
-    .terminal-card {
-        border-left: 5px solid #ff0055; background: rgba(255, 0, 85, 0.02);
-        padding: 20px; border-radius: 5px; margin-bottom: 15px;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif; background-color: #0e1117; color: white; }
+    .status-card {
+        background: #161b22; border-radius: 15px; padding: 20px;
+        border: 1px solid #30363d; margin-bottom: 20px;
     }
-    .ai-commander {
-        border: 1px solid #00e5ff; background: rgba(0, 229, 255, 0.05);
-        padding: 20px; border-radius: 20px; box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
-    }
-    .glitch-text { color: #ff0055; font-weight: bold; text-transform: uppercase; }
+    .score-high { color: #238636; font-size: 40px; font-weight: bold; }
+    .score-low { color: #da3633; font-size: 40px; font-weight: bold; }
     header {visibility: hidden;} footer {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
-# --- ASSETS ---
+# --- LOAD ASSETS ---
 def load_lottie(url):
-    try: return requests.get(url, timeout=5).json()
+    try: return requests.get(url).json()
     except: return None
 
-lottie_core = load_lottie("https://lottie.host/8553641b-10f7-434a-9524-71e98822588c/OayXwS3S0R.json")
+lottie_secure = load_lottie("https://lottie.host/8553641b-10f7-434a-9524-71e98822588c/OayXwS3S0R.json")
 
-# --- AI INCIDENT COMMANDER LOGIC ---
-def ai_incident_commander(threat_level):
-    comments = {
-        "LOW": [
-            "Officer, the network is stable. All nodes are reporting green.",
-            "Minimal packet fragmentation detected. System health is optimal."
-        ],
-        "MEDIUM": [
-            "Alert! Unusual handshake patterns detected on Node 192.168.4.1.",
-            "Warning: Port 443 is receiving high-entropy payloads. Investigation advised."
-        ],
-        "HIGH": [
-            "CRITICAL: Unauthorized privilege escalation attempt detected!",
-            "EMERGENCY: DDoS flood in progress. Autonomous containment engaged."
-        ]
-    }
-    return random.choice(comments[threat_level])
+# --- DATA SIMULATION ENGINE ---
+def get_device_data():
+    devices = [
+        {"Device": "Smart TV", "IP": "192.168.1.10", "Activity": "Streaming", "Risk": "Low", "Data_Sent": "1.2 GB"},
+        {"Device": "CCTV Camera", "IP": "192.168.1.15", "Activity": "Uploading to Unknown Server", "Risk": "High", "Data_Sent": "450 MB"},
+        {"Device": "iPhone 15", "IP": "192.168.1.5", "Activity": "Browsing", "Risk": "Low", "Data_Sent": "80 MB"},
+        {"Device": "Smart Fridge", "IP": "192.168.1.20", "Activity": "Idle", "Risk": "Medium", "Data_Sent": "5 MB"}
+    ]
+    return pd.DataFrame(devices)
 
-# --- SIMULATED FORENSIC DATA ---
-if 'forensic_logs' not in st.session_state:
-    st.session_state.forensic_logs = []
+# --- AI ADVISOR LOGIC ---
+def get_ai_advice(score):
+    if score > 80:
+        return "✅ Aapka Network safe hai. Tamam devices sahi kaam kar rahe hain."
+    elif score > 50:
+        return "⚠️ Kuch devices (CCTV/Fridge) zyada data bhej rahe hain. Unki settings check karein."
+    else:
+        return "🚨 Khatra! Aapka privacy score bohot kam hai. Kisi ne unauthorized access kiya hai."
 
-def generate_forensic_event():
-    threats = ["CLEAN", "CLEAN", "SCAN", "EXFIL", "DDoS"]
-    t = random.choice(threats)
-    level = "LOW" if t == "CLEAN" else "MEDIUM" if t == "SCAN" else "HIGH"
+# --- NAVIGATION ---
+st.sidebar.title("🛡️ NetGuard AI")
+menu = st.sidebar.radio("Navigation", ["Home Dashboard", "Privacy Scan", "AI Assistant"])
+
+if menu == "Home Dashboard":
+    st.markdown("<h1 style='text-align:center;'>NetGuard AI Guardian</h1>", unsafe_allow_html=True)
     
-    event = {
-        "Timestamp": time.strftime("%H:%M:%S"),
-        "Event": t,
-        "Threat_Level": level,
-        "Origin": f"ZONE-{random.randint(1,9)}",
-        "Data_Volume": random.randint(100, 5000)
-    }
-    st.session_state.forensic_logs.append(event)
-    if len(st.session_state.forensic_logs) > 15: st.session_state.forensic_logs.pop(0)
-    return level
-
-# --- APP LAYOUT ---
-st.markdown("<h1 style='text-align:center; color:#ff0055;'>VORTEX-AI // NEURAL FORENSICS</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; color:#00e5ff;'>Advanced Network Attack Path Reconstruction Tool</p>", unsafe_allow_html=True)
-
-# Main Grid
-col_a, col_b = st.columns([1, 2])
-
-with col_a:
-    st.markdown("<div class='ai-commander'>", unsafe_allow_html=True)
-    st.write("### 🤖 INCIDENT COMMANDER")
-    if lottie_core: st_lottie(lottie_core, height=180)
+    col1, col2, col3 = st.columns([1, 1, 1])
     
-    # Generate event and get threat level
-    current_level = generate_forensic_event()
-    st.write(f"**AI VERDICT:** {current_level}")
-    st.info(ai_incident_commander(current_level))
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Calculate Score
+    privacy_score = random.randint(45, 95)
     
-    # 3D Visual Metric
-    st.write("#### Neural Load")
-    fig_gauge = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = random.randint(20, 95) if current_level != "HIGH" else 99,
-        domain = {'x': [0, 1], 'y': [0, 1]},
-        title = {'text': "Traffic Intensity", 'font': {'color': "#00e5ff"}},
-        gauge = {'axis': {'range': [None, 100], 'tickcolor': "#00e5ff"},
-                 'bar': {'color': "#ff0055"},
-                 'bgcolor': "black",
-                 'borderwidth': 2,
-                 'bordercolor': "#00e5ff"}
-    ))
-    fig_gauge.update_layout(paper_bgcolor='rgba(0,0,0,0)', font={'color': "#00e5ff", 'family': "Fira Code"})
-    st.plotly_chart(fig_gauge, use_container_width=True)
+    with col1:
+        st.markdown("<div class='status-card'>", unsafe_allow_html=True)
+        st.write("### Network Health")
+        if privacy_score > 70:
+            st.markdown(f"<p class='score-high'>{privacy_score}%</p>", unsafe_allow_html=True)
+            st.write("Status: Secure")
+        else:
+            st.markdown(f"<p class='score-low'>{privacy_score}%</p>", unsafe_allow_html=True)
+            st.write("Status: Warning")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-with col_b:
-    st.write("### 🌐 3D ATTACK PATH RECONSTRUCTION")
+    with col2:
+        if lottie_secure: st_lottie(lottie_secure, height=150)
     
-    # Create 3D Scatter for Traffic
-    df = pd.DataFrame(st.session_state.forensic_logs)
-    if not df.empty:
-        # Simulate 3D coordinates
-        df['x'] = [random.uniform(0, 10) for _ in range(len(df))]
-        df['y'] = [random.uniform(0, 10) for _ in range(len(df))]
-        df['z'] = df['Data_Volume'] / 100
-        
-        fig_3d = px.scatter_3d(df, x='x', y='y', z='z', color='Threat_Level',
-                              text='Event', size='Data_Volume',
-                              color_discrete_map={"LOW": "#00ffcc", "MEDIUM": "#ffcc00", "HIGH": "#ff0055"})
-        fig_3d.update_layout(scene=dict(xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(title="Volume")),
-                             paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, b=0, t=0))
-        st.plotly_chart(fig_3d, use_container_width=True)
-    
-    # Forensic Timeline Table
-    st.write("### 📜 FORENSIC TIMELINE")
-    for log in reversed(st.session_state.forensic_logs):
-        color = "#00ffcc" if log['Threat_Level'] == "LOW" else "#ff0055"
-        st.markdown(f"""
-        <div class='terminal-card' style='border-left: 5px solid {color};'>
-            <span style='color:gray;'>[{log['Timestamp']}]</span> 
-            <b>EVENT: {log['Event']}</b> // ORIGIN: {log['Origin']} // 
-            STATUS: <span style='color:{color};'>{log['Threat_Level']}</span>
-        </div>
-        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown("<div class='status-card'>", unsafe_allow_html=True)
+        st.write("### AI Summary")
+        st.info(get_ai_advice(privacy_score))
+        st.markdown("</div>", unsafe_allow_html=True)
 
-# Footer info
-st.sidebar.title("VORTEX CORE")
-st.sidebar.write("Project: VortexAI Forensics")
-st.sidebar.write("Module: Neural Path Recon")
-if st.sidebar.button("RESET CORE"):
-    st.session_state.forensic_logs = []
-    st.rerun()
+    st.write("### Active Devices on your Wi-Fi")
+    df = get_device_data()
+    st.table(df)
 
-time.sleep(2)
-st.rerun()
+    # Traffic Graph
+    st.write("### Data Usage Trend")
+    fig = px.bar(df, x='Device', y='Data_Sent', color='Risk', template="plotly_dark",
+                 color_discrete_map={"Low": "#238636", "Medium": "#e3b341", "High": "#da3633"})
+    st.plotly_chart(fig, use_container_width=True)
+
+elif menu == "Privacy Scan":
+    st.header("Deep Privacy Inspection")
+    if st.button("Start Deep Scan"):
+        with st.spinner("Analyzing Packet Patterns..."):
+            time.sleep(3)
+            st.warning("Detection: CCTV Camera is sending unencrypted packets to a server in Russia.")
+            st.error("Action Required: Block IP 45.12.11.0 on your router.")
+            st.image("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=SecurityScanComplete")
+
+elif menu == "AI Assistant":
+    st.header("Ask NetGuard AI")
+    user_input = st.text_input("Ask anything (e.g. Is my Wi-Fi safe?)")
+    if user_input:
+        st.write("🤖 **AI Agent:** Aapka Smart TV filhal Amazon servers se connect hai jo ke normal hai. Lekin aapka CCTV camera suspicious behavior dikha raha hai. Kya aap usay block karna chahte hain?")
