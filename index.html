@@ -3,178 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetDoc AI Pro | Launch Intelligence</title>
+    <title>NetDoc AI Pro | The Autonomous Network Physician</title>
+    
+    <!-- External Resources -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Plus+Jakarta+Sans:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
     <style>
         :root {
-            --cyan: #00f2ff;
-            --purple: #bc13fe;
-            --dark: #020617;
+            --primary: #00f2ff;
+            --secondary: #bc13fe;
+            --dark-bg: #020617;
+            --card-bg: rgba(255, 255, 255, 0.03);
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--dark);
+            background-color: var(--dark-bg);
             font-family: 'Plus Jakarta Sans', sans-serif;
-            color: white;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            color: #f8fafc;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
         }
 
-        /* Animated Background */
-        .bg-glow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #020617 100%);
-            z-index: -1;
+        /* Animated Glowing Background */
+        .bg-gradient {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 30%, #1e1b4b 0%, #020617 70%);
+            z-index: -2;
         }
 
-        .blob {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: linear-gradient(135deg, var(--cyan), var(--purple));
-            filter: blur(80px);
+        .floating-blob {
+            position: fixed;
+            width: 600px; height: 600px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            filter: blur(100px);
             border-radius: 50%;
-            opacity: 0.15;
-            animation: move 20s infinite alternate;
+            opacity: 0.1;
+            z-index: -1;
+            animation: float 20s infinite alternate;
         }
 
-        @keyframes move {
-            from { transform: translate(-20%, -20%); }
-            to { transform: translate(20%, 20%); }
+        @keyframes float {
+            0% { transform: translate(-10%, -10%); }
+            100% { transform: translate(20%, 20%); }
         }
 
-        .container {
-            text-align: center;
-            z-index: 10;
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            transition: 0.4s;
+        }
+        .glass-card:hover {
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
         }
 
-        .title {
+        .neon-text {
             font-family: 'Orbitron', sans-serif;
-            font-size: 4rem;
-            font-weight: 700;
-            background: linear-gradient(to right, var(--cyan), var(--purple));
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
-            margin-bottom: 1rem;
         }
 
-        .subtitle {
-            font-size: 1.2rem;
-            color: #94a3b8;
-            max-width: 600px;
-            margin: 0 auto 2.5rem auto;
-            line-height: 1.6;
-        }
-
-        /* The Animated Launch Button */
         .launch-btn {
-            position: relative;
-            display: inline-block;
-            padding: 18px 60px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
             background: linear-gradient(90deg, #00f2ff, #0062ff);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 242, 255, 0.4);
+            font-family: 'Orbitron', sans-serif;
             transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
-            border: none;
-            cursor: pointer;
         }
-
         .launch-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.7);
-            letter-spacing: 2px;
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 242, 255, 0.6);
         }
 
-        .launch-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: 0.5s;
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
         }
 
-        .launch-btn:hover::before {
-            left: 100%;
-        }
-
-        .features {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 3rem;
-        }
-
-        .feature-tag {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 20px;
-            border-radius: 30px;
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            font-size: 0.9rem;
-            color: var(--cyan);
-        }
-
-        .footer-text {
-            position: absolute;
-            bottom: 30px;
-            font-size: 0.8rem;
-            color: #475569;
-            letter-spacing: 1px;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
     </style>
 </head>
 <body>
-    <div class="bg-glow"></div>
-    <div class="blob"></div>
-    
-    <div class="container">
-        <h1 class="title">NETDOC AI PRO</h1>
-        <p class="subtitle">
-            Autonomous Cyber-Medical Diagnostic Agent & Forensic Suite. 
-            Experience the future of intelligent network troubleshooting with real-time AI analysis.
-        </p>
+    <div class="bg-gradient"></div>
+    <div class="floating-blob"></div>
 
-        <a href="https://net-sentry-pro-jhqqohnuvevxr9qfnd8hug.streamlit.app/" target="_blank" class="launch-btn">
-            🚀 Launch Project
-        </a>
-
-        <div class="features">
-            <div class="feature-tag">Neural Diagnostics</div>
-            <div class="feature-tag">Forensic Audit</div>
-            <div class="feature-tag">AI Predictions</div>
+    <!-- Navigation -->
+    <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="text-2xl font-bold neon-text">NETDOC AI</div>
+        <div class="space-x-8 hidden md:flex">
+            <a href="#about" class="hover:text-cyan-400 transition">About</a>
+            <a href="#features" class="hover:text-cyan-400 transition">Features</a>
+            <a href="#tech" class="hover:text-cyan-400 transition">Tech Stack</a>
         </div>
-    </div>
+        <a href="https://net-sentry-pro-jhqqohnuvevxr9qfnd8hug.streamlit.app/" target="_blank" class="launch-btn px-6 py-2 rounded-full text-sm font-bold text-white uppercase">Launch App</a>
+    </nav>
 
-    <div class="footer-text">
-        DEVELOPED BY [YOUR NAME] | UNIVERSITY SEMESTER PROJECT
-    </div>
+    <!-- Hero Section -->
+    <header class="py-24 px-6 text-center max-w-5xl mx-auto">
+        <h1 class="text-6xl md:text-8xl font-extrabold mb-6 neon-text" data-aos="zoom-in">NETDOC AI PRO</h1>
+        <p class="text-xl text-slate-400 mb-10" data-aos="fade-up" data-aos-delay="200">
+            The World's First Autonomous AI Agent for Network Diagnostics, Forensic Auditing, and Predictive Intelligence. 
+            Troubleshooting the future, today.
+        </p>
+        <div data-aos="fade-up" data-aos-delay="400">
+            <a href="https://net-sentry-pro-jhqqohnuvevxr9qfnd8hug.streamlit.app/" target="_blank" class="launch-btn px-12 py-5 rounded-full text-xl font-bold text-white inline-block">
+                🚀 START SYSTEM SCAN
+            </a>
+        </div>
+    </header>
 
+    <!-- Project Overview -->
+    <section id="about" class="py-20 max-w-7xl mx-auto px-6">
+        <div class="glass-card p-10 md:p-20" data-aos="fade-up">
+            <h2 class="section-title text-white">The Purpose</h2>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <p class="text-lg text-slate-300 leading-relaxed">
+                    Networking is the backbone of the digital age, yet troubleshooting it remains complex for most users. 
+                    <b>NetDoc AI Pro</b> solves this pain point by acting as a "Network Physician." 
+                    It uses Machine Learning to diagnose issues, visualize traffic stability, and provide 
+                    English & Urdu prescriptions to heal your network DNA.
+                </p>
+                <img src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" alt="Net AI" class="w-64 mx-auto animate-pulse">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="py-20 max-w-7xl mx-auto px-6">
+        <h2 class="section-title" data-aos="fade-down">Project Modules</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Module 1 -->
+            <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="100">
+                <div class="text-4xl mb-4 text-cyan-400">🏥</div>
+                <h3 class="text-2xl font-bold mb-3">AI Clinic</h3>
+                <p class="text-slate-400 text-sm">Deep Bio-Scan measuring Latency, Packet integrity, and Node saturation using RandomForest classifiers.</p>
+            </div>
+            <!-- Module 2 -->
+            <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-4xl mb-4 text-cyan-400">🧬</div>
+                <h3 class="text-2xl font-bold mb-3">Neural Vitals</h3>
+                <p class="text-slate-400 text-sm">Real-time stability pulse visualization showing Uplink and Downlink flow patterns.</p>
+            </div>
+            <!-- Module 3 -->
+            <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="300">
+                <div class="text-4xl mb-4 text-cyan-400">🛡️</div>
+                <h3 class="text-2xl font-bold mb-3">Cyber Shield</h3>
+                <p class="text-slate-400 text-sm">Security auditing verifying TLS 1.3 encryption and blocking unauthorized packet injections.</p>
+            </div>
+            <!-- Module 4 -->
+            <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="400">
+                <div class="text-4xl mb-4 text-cyan-400">🔮</div>
+                <h3 class="text-2xl font-bold mb-3">AI Prediction</h3>
+                <p class="text-slate-400 text-sm">Heuristic forecasting of network load for the next 24 hours to prevent future congestion.</p>
+            </div>
+            <!-- Module 5 -->
+            <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="500">
+                <div class="text-4xl mb-4 text-cyan-400">📜</div>
+                <h3 class="text-2xl font-bold mb-3">Official Audit</h3>
+                <p class="text-slate-400 text-sm">Generation of professional forensic reports including clinical prescriptions and digital signatures.</p>
+            </div>
+            <!-- Tech Module -->
+            <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="600">
+                <div class="text-4xl mb-4 text-cyan-400">⚙️</div>
+                <h3 class="text-2xl font-bold mb-3">Self-Healing</h3>
+                <p class="text-slate-400 text-sm">Autonomous logic to suggest channel optimization and gateway reboots automatically.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section id="tech" class="py-20 text-center max-w-7xl mx-auto px-6">
+        <h2 class="section-title" data-aos="fade-down">Technological Backbone</h2>
+        <div class="flex flex-wrap justify-center gap-6">
+            <span class="glass-card px-8 py-4 font-bold text-cyan-400 border border-cyan-500">Python 3.10+</span>
+            <span class="glass-card px-8 py-4 font-bold text-cyan-400 border border-cyan-500">Streamlit UI</span>
+            <span class="glass-card px-8 py-4 font-bold text-cyan-400 border border-cyan-500">Scikit-Learn (AI)</span>
+            <span class="glass-card px-8 py-4 font-bold text-cyan-400 border border-cyan-500">Plotly (Forensics)</span>
+            <span class="glass-card px-8 py-4 font-bold text-cyan-400 border border-cyan-500">Pandas (Data)</span>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-20 border-t border-slate-800 text-center">
+        <p class="text-slate-500 mb-4 uppercase tracking-widest text-sm">Ready to Optimize your Network?</p>
+        <a href="https://net-sentry-pro-jhqqohnuvevxr9qfnd8hug.streamlit.app/" target="_blank" class="neon-text text-2xl font-bold hover:opacity-80">LAUNCH NETDOC AI PRO</a>
+        <div class="mt-12 text-slate-400 text-lg">
+            Developed by <span class="font-bold text-white">FutureCodersAi</span>
+        </div>
+        <p class="mt-2 text-slate-600 text-xs">&copy; 2024 University Semester Project. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-        // Simple cursor tracking for background effect
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+
+        // Mouse Tracker Blob Effect
         document.addEventListener('mousemove', (e) => {
-            const blob = document.querySelector('.blob');
-            const x = e.clientX;
-            const y = e.clientY;
-            blob.style.left = x - 250 + 'px';
-            blob.style.top = y - 250 + 'px';
+            const blob = document.querySelector('.floating-blob');
+            blob.style.left = e.clientX - 300 + 'px';
+            blob.style.top = e.clientY - 300 + 'px';
         });
     </script>
 </body>
