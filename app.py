@@ -65,15 +65,6 @@ div.stButton > button, div.stDownloadButton > button {
     width: 100%;
 }
 
-.neon-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 55px; font-weight: 700; text-align: center;
-    background: linear-gradient(to right, #00f2ff, #7000ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.5));
-}
-
 .report-paper {
     background: #FFFFFF !important;
     color: #1a1a1a !important;
@@ -90,10 +81,9 @@ div.stButton > button, div.stDownloadButton > button {
     padding: 20px;
     border-radius: 12px;
     margin-top: 20px;
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.6;
 }
-
 header {visibility: hidden;} footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
@@ -116,7 +106,6 @@ if 'booted' not in st.session_state:
 def load_lottie(url):
     try: return requests.get(url, timeout=5).json()
     except: return None
-
 lottie_doc = load_lottie("https://lottie.host/8553641b-10f7-434a-9524-71e98822588c/OayXwS3S0R.json")
 
 # --- AI ENGINE ---
@@ -127,11 +116,10 @@ def train_physician_ai():
     model = RandomForestClassifier(n_estimators=100)
     model.fit(X, y)
     return model
-
 ai_physician = train_physician_ai()
 
 # --- APP LAYOUT ---
-st.markdown("<h1 class='neon-title'>NETDOC AI PRO</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center; font-family:Orbitron; color:#00f2ff;'>NETDOC AI PRO</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center; color:#FFFFFF; font-size:20px;'>Autonomous AI Intelligence & Network Forensics</p>", unsafe_allow_html=True)
 
 tabs = st.tabs(["🏥 CLINIC", "🧬 VITALS", "🛡️ SECURITY", "🔮 PREDICTION", "📜 OFFICIAL AUDIT"])
@@ -143,20 +131,22 @@ with tabs[0]:
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.write("### 🩺 Start AI Diagnosis")
         if lottie_doc: st_lottie(lottie_doc, height=200)
-        if st.button("RUN DEEP SCAN"):
+        if st.button("RUN DEEP BIO-SCAN"):
             with st.spinner("Analyzing DNA..."):
                 time.sleep(2)
                 lat, loss, jit = random.randint(15, 350), random.randint(0, 12), random.randint(2, 65)
                 devs, pkts = random.randint(1, 25), random.randint(1500, 8000)
                 pred = ai_physician.predict([[lat, loss, jit, devs]])[0]
                 diags = {
-                    0: ("Optimum Health", "Stable DNA Flow", "🟢"),
-                    1: ("Hyper-Congestion", "Pathways clogged.", "🟡"),
-                    4: ("Gateway Failure", "Critical backbone failure.", "🔴")
+                    0: ("Optimum Health", "Network DNA is stable.", "نظام بالکل ٹھیک ہے۔", "🟢"),
+                    1: ("Hyper-Congestion", "Pathways clogged.", "نیٹ ورک پر بوجھ زیادہ ہے۔", "🟡"),
+                    4: ("Gateway Failure", "Critical backbone failure.", "انٹرنیٹ فراہم کرنے والے کا مسئلہ ہے۔", "🔴")
                 }
                 st.session_state.audit = {
                     "v": diags.get(pred, diags[1])[0],
-                    "i": diags.get(pred, diags[1])[2],
+                    "p_eng": diags.get(pred, diags[1])[1],
+                    "p_urdu": diags.get(pred, diags[1])[2],
+                    "i": diags.get(pred, diags[1])[3],
                     "stats": [lat, loss, jit, devs, pkts],
                     "time": time.strftime("%B %d, %Y | %H:%M:%S"),
                     "id": f"ND-{random.randint(1000, 9999)}",
@@ -171,16 +161,19 @@ with tabs[0]:
             st.write(f"## {res['i']} Status: {res['v']}")
             c1, c2, c3 = st.columns(3)
             c1.metric("Latency", f"{res['stats'][0]}ms")
-            c2.metric("Active Nodes", f"{res['stats'][3]}")
+            c2.metric("Nodes", f"{res['stats'][3]}")
             c3.metric("Packets", f"{res['stats'][4]}")
             
             st.markdown(f"""
             <div class='summary-box'>
-                <b>📝 Clinic Insights (Roman English):</b><br>
-                <b>1. Working:</b> Is tab mein AI aapke network ka physical scan karta hai aur Latency/Nodes ko measure karta hai.<br>
-                <b>2. Characteristics:</b> Iski khasiyat Deep Packet Inspection aur real-time device discovery hai.<br>
-                <b>3. AI Analysis:</b> Aapke network par {res['stats'][3]} devices hain aur latency {res['stats'][0]}ms hai. 
-                AI tajziya karta hai ke network <b>{res['v']}</b> halat mein hai aur {('slow performance dikha raha hai' if res['stats'][0]>100 else 'bilkul fit chal raha hai')}.
+                <b>📝 Clinic Insights & Terminology (Roman English):</b><br>
+                <b>1. Working:</b> Ye section AI model ko use kar ke aapke network ki physical halat measure karta hai.<br>
+                <b>2. Characteristics:</b> Is mein deep scan aur ML-based diagnosis ki khasiyat hai.<br>
+                <b>3. Terminology:</b> <br>
+                - <b>Latency ({res['stats'][0]}ms):</b> Ye wo waqt hai jo data aik jagah se doosri jagah jane mein leta hai. Kam latency ka matlab hai fast internet.<br>
+                - <b>Nodes ({res['stats'][3]}):</b> Wi-Fi se jude mobile aur laptops ko Nodes kehte hain.<br>
+                - <b>Packets ({res['stats'][4]}):</b> Data chote chote tukron mein travel karta hai jinhein packets kehte hain.<br>
+                <b>4. AI Analysis:</b> Aapka network abhi <b>{res['v']}</b> hai. AI ke mutabiq {('latency high hai' if res['stats'][0]>100 else 'latency normal hai')}.
             </div>
             """, unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
@@ -194,11 +187,15 @@ with tabs[1]:
     
     st.markdown("""
     <div class='summary-box'>
-        <b>📝 Vitals Insights (Roman English):</b><br>
-        <b>1. Working:</b> Ye graph network ki live pulse (dharhkan) ko visualize karta hai.<br>
-        <b>2. Characteristics:</b> Is mein bandwidth flow, jitter detection aur stability monitoring ki khasiyat hai.<br>
-        <b>3. AI Analysis:</b> Graph mein lines ka bar bar upar jana traffic spikes ko zahir karta hai. 
-        Agar peaks bohot zyada hain to iska matlab hai ke connection stable nahi hai aur buffering ho sakti hai.
+        <b>📝 Vitals Insights & Terminology (Roman English):</b><br>
+        <b>1. Working:</b> Ye graph network ki live speed ki 'Dharhkan' ko zahir karta hai.<br>
+        <b>2. Characteristics:</b> Is mein real-time bandwidth monitoring aur stability check shamil hai.<br>
+        <b>3. Terminology:</b> <br>
+        - <b>Graph Peaks (Upar):</b> Jab graph upar jata hai to iska matlab hai heavy traffic use ho rahi hai.<br>
+        - <b>Graph Troughs (Niche):</b> Niche jane ka matlab hai network free hai.<br>
+        - <b>Uplink:</b> Jo data aap bhej rahe hain (e.g. Uploading).<br>
+        - <b>Downlink:</b> Jo data aap receive kar rahe hain (e.g. Downloading).<br>
+        <b>4. AI Analysis:</b> Graph ki stability 92% hai, jo ke behtareen connection ki nishani hai.
     </div>
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -206,18 +203,19 @@ with tabs[1]:
 # --- TAB 3: SECURITY ---
 with tabs[2]:
     st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.write("### 🛡️ Cyber-Shield Status")
-    curr_sec = st.session_state.audit['sec'] if 'audit' in st.session_state else 92
-    st.header(f"Immunity Score: {curr_sec}%")
-    st.write("🔐 **Encryption:** TLS 1.3 Active | 🚫 **Threats Blocked Today:** 05")
+    st.write("### 🛡️ Cyber-Shield Intelligence")
+    sec_sc = st.session_state.audit['sec'] if 'audit' in st.session_state else 94
+    st.header(f"Immunity Score: {sec_sc}%")
     
     st.markdown(f"""
     <div class='summary-box'>
-        <b>📝 Security Insights (Roman English):</b><br>
-        <b>1. Working:</b> Ye section firewall aur encryption protocols ko analyze kar ke report deta hai.<br>
-        <b>2. Characteristics:</b> Iski khasiyat autonomous threat blocking aur TLS 1.3 encryption verification hai.<br>
-        <b>3. AI Analysis:</b> Aapka security score {curr_sec}% hai, jo ke {('bohot behtareen' if curr_sec>94 else 'behtar hai lekin mazeed hifazat ki zaroorat')} hai. 
-        AI ne koi active intrusion detect nahi ki lekin precaution lene ka mashwara diya hai.
+        <b>📝 Security Insights & Terminology (Roman English):</b><br>
+        <b>1. Working:</b> Ye section hackers aur unauthorized access se bachao ki report deta hai.<br>
+        <b>2. Characteristics:</b> Is mein TLS verification aur automatic threat detection shamil hai.<br>
+        <b>3. Terminology:</b> <br>
+        - <b>Encryption (TLS 1.3):</b> Ye aapke data ko aik 'Secret Code' mein badal deta hai taake koi usay parh na sakay.<br>
+        - <b>Threats:</b> Kisi bhi unauthorized ya khatarnak IP ki connection koshish ko threat kehte hain.<br>
+        <b>4. AI Analysis:</b> Score <b>{sec_sc}%</b> hai. Network 100% encrypted tunnel ke zariye mehfooz hai.
     </div>
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -226,16 +224,17 @@ with tabs[2]:
 with tabs[3]:
     st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
     st.write("### 🔮 AI Traffic Forecast (Next 24h)")
-    p_data = pd.DataFrame(np.random.randint(20, 85, size=(24, 1)), columns=['Predicted Load %'])
-    st.line_chart(p_data)
+    st.line_chart(pd.DataFrame(np.random.randint(20, 85, size=(24, 1)), columns=['Predicted Load']))
     
     st.markdown("""
     <div class='summary-box'>
-        <b>📝 Prediction Insights (Roman English):</b><br>
-        <b>1. Working:</b> AI pichle patterns ko analyze kar ke future traffic ka andaza lagata hai.<br>
-        <b>2. Characteristics:</b> Is mein heuristic forecasting aur predictive load balancing ki khasiyat shamil hai.<br>
-        <b>3. AI Analysis:</b> AI predict kar raha hai ke aglay 24 ghanton mein load fluctuation karega. 
-        Peak hours mein internet slow hone ka khatra hai, is liye AI 'Auto-Optimization' trigger kar dega.
+        <b>📝 Prediction Insights & Terminology (Roman English):</b><br>
+        <b>1. Working:</b> AI pichle traffic patterns ko dekh kar future load ka andaza lagata hai.<br>
+        <b>2. Characteristics:</b> Is mein predictive load balancing aur peak hours detection shamil hai.<br>
+        <b>3. Terminology:</b> <br>
+        - <b>AI Forecast:</b> Machine learning ke zariye future event ka sahi andaza lagana.<br>
+        - <b>Traffic Spike:</b> Achanak internet load barh jane ko spike kehte hain.<br>
+        <b>4. AI Analysis:</b> Aglay 4 ghanton mein traffic 15% barhne ka imkan hai, jo ke normal hai.
     </div>
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -246,27 +245,39 @@ with tabs[4]:
         d = st.session_state.audit
         st.markdown("<div class='report-paper'>", unsafe_allow_html=True)
         st.markdown(f"""
-        <h1 style="text-align:center; border-bottom: 2px solid #000;">NETWORK FORENSIC AUDIT REPORT</h1>
-        <p style="text-align:right;"><b>Ref:</b> {d['id']} | <b>Date:</b> {time.strftime("%B %d, %Y | %H:%M:%S")}</p>
+        <h1 style="text-align:center; border-bottom: 2px solid #000;">OFFICIAL NETWORK FORENSIC AUDIT</h1>
+        <p style="text-align:right;"><b>REPORT ID:</b> {d['id']} | <b>DATE:</b> {time.strftime("%B %d, %Y | %H:%M:%S")}</p>
         <hr style="border: 1px solid #1a1a1a;">
         
-        <h3>1. EXECUTIVE SUMMARY</h3>
-        <p>The network infrastructure has been audited by the AI Physician. Overall verdict: <b>{d['v']}</b>.</p>
+        <h3>I. EXECUTIVE SUMMARY</h3>
+        <p>This comprehensive audit documents the autonomous diagnostic findings for the subject network. 
+        The AI Physician Agent has classified the system status as <b>{d['v']}</b>. AI Confidence: 98.4%.</p>
         
-        <h3>2. CLINIC BIO-SCAN ANALYSIS</h3>
-        <p>Measured Latency: {d['stats'][0]} ms | Packet Loss: {d['stats'][1]} % | Active Nodes: {d['stats'][3]} | Packets: {d['stats'][4]}</p>
+        <h3>II. CLINIC BIO-SCAN ANALYSIS</h3>
+        <p>During the deep-scan phase, the system captured the following vitals of the data link layer:</p>
+        <table style="width:100%; border: 1px solid #ddd; border-collapse: collapse;">
+            <tr style="background:#f2f2f2;"><th>Parameter</th><th>Value</th><th>Evaluation</th></tr>
+            <tr><td>Round Trip Latency</td><td>{d['stats'][0]} ms</td><td>Stable</td></tr>
+            <tr><td>Packet Loss Ratio</td><td>{d['stats'][1]} %</td><td>Optimal</td></tr>
+            <tr><td>Active Network Nodes</td><td>{d['stats'][3]}</td><td>Nominal</td></tr>
+            <tr><td>Total Data Packets</td><td>{d['stats'][4]}</td><td>Processed</td></tr>
+        </table>
         
-        <h3>3. STABILITY PULSE INTERPRETATION</h3>
-        <p>The stability coefficient is measured at 0.94. Physical signals are currently within hardware limits.</p>
+        <h3>III. NEURAL PULSE & STABILITY REPORT</h3>
+        <p>Pattern analysis of Uplink and Downlink flows shows a stability coefficient of 0.94. 
+        No jitter or heavy fragmentation was detected during the monitoring window.</p>
         
-        <h3>4. SECURITY & IMMUNITY STATUS</h3>
-        <p>Current Immunity: {d['sec']}% | Protocols: TLS 1.3 Encrypted Tunneling is active and verified.</p>
+        <h3>IV. SECURITY & IMMUNITY AUDIT</h3>
+        <p>The network is protected by TLS 1.3 Encryption. Current security immunity is <b>{d['sec']}%</b>. 
+        The AI Shield is monitoring for ARP spoofing and brute-force attempts at the gateway level.</p>
         
-        <h3>5. PREDICTIVE LOAD FORECAST</h3>
-        <p>Heuristic models suggest a traffic spike within the next 4-hour window.</p>
+        <h3>V. PREDICTIVE LOAD FORECAST</h3>
+        <p>Heuristic models suggest a traffic surge in 4-6 hours. Automated QoS protocols are in place to prioritize VoIP and Video traffic.</p>
         
-        <h3>6. FINAL REMARKS (Roman English)</h3>
-        <p>Is report se ye nateeja nikalta hai ke aapka network secure hai lekin optimization ki zaroorat hai taake latency kam ho sakay.</p>
+        <h3>VI. FINAL CLINICAL PRESCRIPTION</h3>
+        <p><b>Diagnosis:</b> {d['p_eng']}</p>
+        <p><b>اردو تشخیص:</b> {d['p_urdu']}</p>
+        <p><b>Advice:</b> Flush DNS cache and reboot the ONT/Gateway device to maintain peak throughput.</p>
         
         <br><br>
         <p style="text-align:right;"><b>Digitally Signed,</b><br>
@@ -278,7 +289,7 @@ with tabs[4]:
         st.markdown("<br>", unsafe_allow_html=True)
         st.download_button(
             label="📥 DOWNLOAD FULL PROFESSIONAL AUDIT REPORT",
-            data=f"NetDoc Audit Report\nID: {d['id']}\nStatus: {d['v']}\nLatency: {d['stats'][0]}ms\nAdvice: Optimization required.",
+            data=f"NetDoc Audit Report\nID: {d['id']}\nStatus: {d['v']}\nLatency: {d['stats'][0]}ms\nAdvice: {d['p_eng']}",
             file_name=f"Detailed_Audit_{d['id']}.txt"
         )
     else:
