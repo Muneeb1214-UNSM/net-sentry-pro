@@ -1,6 +1,5 @@
 streamlit
 streamlit-lottie
-scapy
 pandas
 plotly
 requests
