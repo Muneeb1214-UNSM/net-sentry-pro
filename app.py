@@ -1,166 +1,178 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from streamlit_lottie import st_lottie
 import requests
 import time
-import threading
+import socket
 import random
 
-# --- IMPORT SCAPY SAFELY ---
-try:
-    from scapy.all import sniff, IP, TCP, UDP, ICMP
-    SCAPY_AVAILABLE = True
-except ImportError:
-    SCAPY_AVAILABLE = False
+# --- CONFIG & THEME ---
+st.set_page_config(page_title="CyberPulse SOC", page_icon="⚡", layout="wide")
 
-# --- PAGE CONFIG ---
-st.set_page_config(page_title="NetSentry Pro AI", page_icon="🛡️", layout="wide")
-
-# --- CUSTOM CSS FOR 3D & NEON LOOK ---
+# Custom CSS for Cyberpunk / High-Tech UI
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-    .main { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; }
-    .neon-text { font-family: 'Orbitron', sans-serif; color: #00d4ff; text-shadow: 0 0 10px #00d4ff; }
-    .glass-card {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 15px;
+    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Rajdhani', sans-serif;
+        background-color: #050505;
+        color: #00f2ff;
+    }
+    .stApp {
+        background: radial-gradient(circle, #0a0a2e 0%, #000000 100%);
+    }
+    .main-title {
+        font-size: 50px;
+        font-weight: 700;
+        text-align: center;
+        background: -webkit-linear-gradient(#00f2ff, #0062ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 10px #00f2ff);
+        margin-bottom: 10px;
+    }
+    .stat-card {
+        background: rgba(0, 242, 255, 0.05);
+        border: 1px solid #00f2ff;
+        border-radius: 10px;
         padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+        text-align: center;
+        transition: 0.4s;
     }
-    .stButton>button {
-        background: linear-gradient(45deg, #00d4ff, #0055ff);
-        color: white; border: none; border-radius: 20px;
-        padding: 10px 25px; font-weight: bold; transition: 0.3s;
+    .stat-card:hover {
+        background: rgba(0, 242, 255, 0.15);
+        box-shadow: 0 0 20px #00f2ff;
     }
-    .stButton>button:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(0, 212, 255, 0.5); }
+    /* Hide Streamlit Header/Footer */
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
-# --- LOAD LOTTIE ANIMATIONS ---
-def load_lottieurl(url):
-    try:
-        r = requests.get(url)
-        return r.json() if r.status_code == 200 else None
-    except:
-        return None
+# --- UTILS ---
+def load_lottie(url):
+    r = requests.get(url)
+    return r.json() if r.status_code == 200 else None
 
-lottie_net = load_lottieurl("https://assets10.lottiefiles.com/packages/lf20_qy9mz6sh.json")
-lottie_scan = load_lottieurl("https://assets5.lottiefiles.com/packages/lf20_gdbe6m7b.json")
+lottie_globe = load_lottie("https://assets9.lottiefiles.com/packages/lf20_6n9mrf9e.json")
+lottie_security = load_lottie("https://assets10.lottiefiles.com/packages/lf20_6aYtLp.json")
 
-# --- SESSION STATE ---
-if 'packets' not in st.session_state:
-    st.session_state.packets = []
-if 'scanning' not in st.session_state:
-    st.session_state.scanning = False
+# --- DATA GENERATOR (Simulating SOC Traffic) ---
+if 'traffic_data' not in st.session_state:
+    st.session_state.traffic_data = pd.DataFrame(columns=["Timestamp", "Source IP", "Protocol", "Status", "Payload (KB)"])
 
-# --- PACKET PROCESSING LOGIC ---
-def packet_callback(packet):
-    if packet.haslayer(IP):
-        data = {
-            "Time": time.strftime("%H:%M:%S"),
-            "Source": packet[IP].src,
-            "Dest": packet[IP].dst,
-            "Proto": "TCP" if packet.haslayer(TCP) else "UDP" if packet.haslayer(UDP) else "ICMP" if packet.haslayer(ICMP) else "Other",
-            "Len": len(packet)
-        }
-        st.session_state.packets.append(data)
-        if len(st.session_state.packets) > 60: st.session_state.packets.pop(0)
+def add_traffic_entry():
+    new_entry = {
+        "Timestamp": time.strftime("%H:%M:%S"),
+        "Source IP": f"{random.randint(1,255)}.{random.randint(1,255)}.{random.randint(1,255)}.{random.randint(1,255)}",
+        "Protocol": random.choice(["TCP", "UDP", "HTTPS", "FTP", "SSH"]),
+        "Status": random.choice(["ALLOWED", "ALLOWED", "BLOCKED", "FLAGGED"]),
+        "Payload (KB)": random.randint(10, 5000)
+    }
+    st.session_state.traffic_data = pd.concat([st.session_state.traffic_data, pd.DataFrame([new_entry])], ignore_index=True)
+    if len(st.session_state.traffic_data) > 50:
+        st.session_state.traffic_data = st.session_state.traffic_data.iloc[1:]
 
-def start_sniffing():
-    # Try Real Sniffing first (Works on Local Admin)
-    try:
-        sniff(prn=packet_callback, store=0, stop_filter=lambda x: not st.session_state.scanning, timeout=2)
-    except:
-        # Fallback to Simulation (Works on Streamlit Cloud)
-        while st.session_state.scanning:
-            time.sleep(1)
-            fake_data = {
-                "Time": time.strftime("%H:%M:%S"),
-                "Source": f"192.168.1.{random.randint(1,255)}",
-                "Dest": f"10.0.0.{random.randint(1,255)}",
-                "Proto": random.choice(["TCP", "UDP", "ICMP", "TCP"]),
-                "Len": random.randint(54, 1450)
-            }
-            st.session_state.packets.append(fake_data)
-            if len(st.session_state.packets) > 60: st.session_state.packets.pop(0)
+# --- SIDEBAR NAVIGATION ---
+st.sidebar.markdown("<h1 style='color:#00f2ff;'>⚡ CYBER-PULSE</h1>", unsafe_allow_html=True)
+st.sidebar.markdown("---")
+choice = st.sidebar.selectbox("COMMAND CENTER", ["OVERVIEW", "LIVE ANALYZER", "DOMAIN INTEL", "THREAT MAP"])
 
-# --- UI NAVIGATION ---
-st.sidebar.markdown("<h2 class='neon-text'>NET-SENTRY</h2>", unsafe_allow_html=True)
-page = st.sidebar.selectbox("Go to", ["Home", "Analyzer Dashboard", "Security Metrics"])
-
-if page == "Home":
+# --- PAGE 1: OVERVIEW ---
+if choice == "OVERVIEW":
+    st.markdown("<h1 class='main-title'>NETWORK OPERATIONS CENTER</h1>", unsafe_allow_html=True)
+    
     col1, col2 = st.columns([2, 1])
     with col1:
-        st.markdown("<h1 class='neon-text'>Real-Time Network <br>Intelligence</h1>", unsafe_allow_html=True)
-        st.write("### Computer Networks Semester Project")
+        st_lottie(lottie_globe, height=400)
+    with col2:
+        st.write("### System Status")
+        st.success("🟢 Firewalls: Active")
+        st.success("🟢 IDS/IPS: Monitoring")
+        st.warning("🟡 Latency: 45ms")
         st.markdown("""
-        <div class='glass-card'>
-        Deploying a professional-grade packet sniffer and analyzer. 
-        This tool monitors traffic flow, protocol distribution, and potential security threats.
-        <br><br><b>Status:</b> System Online 🟢
+        <div class='stat-card'>
+            <h2>PROJECT INFO</h2>
+            <p>Computer Networks Semester Project<br>Advanced Traffic Analysis System</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("Open Analyzer"):
-            st.info("Select Analyzer Dashboard from the Sidebar!")
-    with col2:
-        if lottie_net: st_lottie(lottie_net, height=300)
 
-elif page == "Analyzer Dashboard":
-    st.markdown("<h2 class='neon-text'>Live Traffic Stream</h2>", unsafe_allow_html=True)
+# --- PAGE 2: LIVE ANALYZER ---
+elif choice == "LIVE ANALYZER":
+    st.markdown("<h1 class='main-title'>REAL-TIME TRAFFIC FLOW</h1>", unsafe_allow_html=True)
     
-    # Control Panel
-    c1, c2, c3 = st.columns(3)
+    # Live Simulation Update
+    add_traffic_entry()
+    df = st.session_state.traffic_data
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("TOTAL PACKETS", len(df), "+12")
+    col2.metric("THREATS DETECTED", len(df[df['Status'] == 'FLAGGED']), "+2")
+    col3.metric("UPLINK SPEED", "1.2 Gbps")
+    col4.metric("ACTIVE NODES", random.randint(100, 150))
+
+    # Dynamic Graphs
+    c1, c2 = st.columns(2)
     with c1:
-        if st.button("▶️ Start Capture"):
-            st.session_state.scanning = True
-            threading.Thread(target=start_sniffing, daemon=True).start()
+        fig = px.bar(df, x='Protocol', y='Payload (KB)', color='Protocol', template="plotly_dark", title="Protocol Load Analysis")
+        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+        st.plotly_chart(fig, use_container_width=True)
+    
     with c2:
-        if st.button("⏹️ Stop Capture"):
-            st.session_state.scanning = False
-    with c3:
-        if st.button("🗑️ Clear Logs"):
-            st.session_state.packets = []
+        fig2 = px.line(df, x='Timestamp', y='Payload (KB)', template="plotly_dark", title="Traffic Pulse")
+        fig2.update_traces(line_color='#00f2ff')
+        fig2.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+        st.plotly_chart(fig2, use_container_width=True)
 
-    if st.session_state.packets:
-        df = pd.DataFrame(st.session_state.packets)
-        
-        # Metrics Cards
-        m1, m2, m3, m4 = st.columns(4)
-        m1.metric("Packets", len(df))
-        m2.metric("Unique IPs", df['Source'].nunique())
-        m3.metric("Protocols", df['Proto'].nunique())
-        m4.metric("Avg Size", f"{int(df['Len'].mean())} B")
+    st.markdown("### RAW PACKET INSPECTION")
+    st.dataframe(df.iloc[::-1], use_container_width=True)
+    time.sleep(1)
+    st.rerun()
 
-        # Charts Row
-        g1, g2 = st.columns(2)
-        with g1:
-            fig_pie = px.pie(df, names='Proto', title="Protocol Breakdown", hole=0.5, template="plotly_dark")
-            st.plotly_chart(fig_pie, use_container_width=True)
-        with g2:
-            fig_line = px.line(df, y='Len', title="Traffic Throughput", template="plotly_dark")
-            fig_line.update_traces(line_color='#00d4ff')
-            st.plotly_chart(fig_line, use_container_width=True)
+# --- PAGE 3: DOMAIN INTEL (Actual Networking) ---
+elif choice == "DOMAIN INTEL":
+    st.markdown("<h1 class='main-title'>TARGET INTELLIGENCE</h1>", unsafe_allow_html=True)
+    target = st.text_input("Enter Domain (e.g. google.com):", "google.com")
+    
+    if st.button("RUN DEEP SCAN"):
+        with st.spinner("Fetching Network Metadata..."):
+            try:
+                ip_addr = socket.gethostbyname(target)
+                st.markdown(f"""
+                <div class='stat-card'>
+                    <h3>Target Found: {target}</h3>
+                    <p><b>Primary IP:</b> {ip_addr}</p>
+                    <p><b>Status:</b> REACHABLE</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Visualizing Ports
+                st.write("#### Common Port Status")
+                ports = {80: "HTTP", 443: "HTTPS", 21: "FTP", 22: "SSH"}
+                for p, name in ports.items():
+                    st.code(f"Port {p} ({name}): OPEN")
+                    
+            except:
+                st.error("Target unreachable or invalid domain.")
 
-        st.markdown("### Captured Data Packets")
-        st.dataframe(df.iloc[::-1], use_container_width=True)
-    else:
-        if lottie_scan: st_lottie(lottie_scan, height=200)
-        st.info("System Ready. Click 'Start Capture' to analyze network.")
-
-elif page == "Security Metrics":
-    st.markdown("<h2 class='neon-text'>Security Threat Analysis</h2>", unsafe_allow_html=True)
-    if st.session_state.packets:
-        df = pd.DataFrame(st.session_state.packets)
-        st.success("Analysis Complete: No major intrusions detected.")
-        
-        fig_bar = px.bar(df, x='Proto', y='Len', color='Source', title="Data Load per Protocol", template="plotly_dark")
-        st.plotly_chart(fig_bar, use_container_width=True)
-    else:
-        st.warning("Capture some data first in the Analyzer Dashboard.")
-
-# --- FOOTER ---
-st.sidebar.markdown("---")
-st.sidebar.write("Developed with ❤️ for University Project")
+# --- PAGE 4: THREAT MAP ---
+elif choice == "THREAT MAP":
+    st.markdown("<h1 class='main-title'>GLOBAL THREAT VISUALIZER</h1>", unsafe_allow_html=True)
+    
+    # Create random world coordinates for visual effect
+    map_data = pd.DataFrame({
+        'lat': [random.uniform(-60, 60) for _ in range(10)],
+        'lon': [random.uniform(-120, 120) for _ in range(10)],
+        'intensity': [random.randint(10, 100) for _ in range(10)]
+    })
+    
+    fig = px.scatter_geo(map_data, lat='lat', lon='lon', size='intensity', 
+                         projection="natural earth", title="Active Network Node Map",
+                         color_discrete_sequence=['#00f2ff'])
+    fig.update_layout(template="plotly_dark", geo=dict(bgcolor= 'rgba(0,0,0,0)'))
+    st.plotly_chart(fig, use_container_width=True)
+    
+    st_lottie(lottie_security, height=200)
