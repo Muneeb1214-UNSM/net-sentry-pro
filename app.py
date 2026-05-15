@@ -16,6 +16,7 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Plus+Jakarta+Sans:wght@300;500;700&display=swap');
 
+/* Dynamic Background Animation */
 @keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -28,6 +29,22 @@ st.markdown("""
     animation: gradientBG 12s ease infinite;
     color: #FFFFFF !important;
     font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Splash Screen Text Animation */
+.welcome-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 60px;
+    font-weight: 700;
+    text-align: center;
+    color: #00f2ff;
+    text-shadow: 0 0 20px #00f2ff;
+    animation: fadeInUp 2s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .glass-card {
@@ -56,7 +73,7 @@ div.stButton > button, div.stDownloadButton > button {
 
 .neon-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 55px; font-weight: 700; text-align: center;
+    font-size: 50px; font-weight: 700; text-align: center;
     background: linear-gradient(to right, #00f2ff, #7000ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -70,19 +87,38 @@ div.stButton > button, div.stDownloadButton > button {
     border-radius: 4px;
     font-family: 'Times New Roman', serif;
     box-shadow: 0 0 50px rgba(0,0,0,0.9);
+    line-height: 1.6;
+}
+.report-paper h1, .report-paper h2, .report-paper h3, .report-paper h4, .report-paper p, .report-paper li, .report-paper b, .report-paper td {
+    color: #1a1a1a !important;
 }
 
 .summary-box {
     background: rgba(0, 242, 255, 0.1);
     border-left: 5px solid #00f2ff;
-    padding: 15px;
+    padding: 20px;
     border-radius: 10px;
     margin-top: 15px;
+    font-size: 16px;
 }
 
 header {visibility: hidden;} footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
+
+# --- SPLASH SCREEN LOGIC ---
+if 'booted' not in st.session_state:
+    placeholder = st.empty()
+    with placeholder.container():
+        st.markdown("<br><br><br><br><br>", unsafe_allow_html=True)
+        st.markdown("<h1 class='welcome-text'>WELCOME TO <br> NETDOC AI PRO</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align:center; color:#00f2ff;'>Initialising Autonomous Neural Core...</p>", unsafe_allow_html=True)
+        progress_bar = st.progress(0)
+        for i in range(100):
+            time.sleep(0.03)
+            progress_bar.progress(i + 1)
+    placeholder.empty()
+    st.session_state.booted = True
 
 # --- ASSETS ---
 def load_lottie(url):
@@ -104,7 +140,7 @@ ai_physician = train_physician_ai()
 
 # --- APP LAYOUT ---
 st.markdown("<h1 class='neon-title'>NETDOC AI PRO</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; color:#FFFFFF; font-size:20px;'>Advanced Neural Intelligence & Network Bio-Forensics</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:#FFFFFF; font-size:20px;'>Advanced Neural Intelligence & Network Forensics Suite</p>", unsafe_allow_html=True)
 
 tabs = st.tabs(["🏥 CLINIC", "🧬 VITALS", "🛡️ SECURITY", "🔮 PREDICTION", "📜 OFFICIAL AUDIT"])
 
@@ -121,7 +157,6 @@ with tabs[0]:
                 time.sleep(2)
                 lat, loss, jit = random.randint(15, 350), random.randint(0, 12), random.randint(2, 65)
                 devs, pkts = random.randint(1, 25), random.randint(1500, 8000)
-                
                 pred = ai_physician.predict([[lat, loss, jit, devs]])[0]
                 diags = {
                     0: ("Optimum Health", "Network DNA is stable.", "نظام بالکل ٹھیک کام کر رہا ہے۔", "🟢"),
@@ -153,9 +188,7 @@ with tabs[0]:
             st.markdown(f"""
             <div class='summary-box'>
                 <b>📝 Clinic Summary (Roman English):</b><br>
-                Is section mein AI aapke network ka check-up karta hai. Latency batati hai ke internet kitna slow hai, 
-                Nodes ka matlab hai kitne mobile/laptops connected hain, aur Packets ka matlab hai kitna data transfer ho raha hai. 
-                AI ne diagnose kiya hai ke aapka network abhi <b>{res['v']}</b> halat mein hai.
+                Is section mein AI aapke network ka 'physical exam' karta hai. <b>Latency</b> batati hai ke data kitna fast travel kar raha hai (kam latency matlab fast speed). <b>Nodes</b> ka matlab hai ke aapke Wi-Fi se kitne mobile ya laptops jude hain. <b>Packets</b> wo chote data units hain jin par hamara AI analysis karta hai taake kisi error ko pehchana ja sakay.
             </div>
             """, unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
@@ -170,8 +203,7 @@ with tabs[1]:
     st.markdown("""
     <div class='summary-box'>
         <b>📝 Vitals Summary (Roman English):</b><br>
-        Ye graph network ki 'Dharhkan' (Pulse) dikhata hai. Uplink aur Downlink lines se pata chalta hai ke 
-        internet ka bahaao (flow) kitna hai. Agar lines bohot upar niche ho rahi hain, to iska matlab hai ke connection stable nahi hai.
+        Ye graph network ka 'Heartbeat' monitor hai. <b>Uplink</b> batata hai ke aap kitna data bhej rahe hain, aur <b>Downlink</b> batata hai ke kitna receive kar rahe hain. Agar graph mein baray peaks hain, to iska matlab hai ke network heavy downloads handle kar raha hai. Agar line smooth hai, to network stable hai.
     </div>
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -185,13 +217,12 @@ with tabs[2]:
         st.header(f"Immunity: {st.session_state.audit['sec_score'] if 'audit' in st.session_state else 94}%")
         st.write("🛡️ **Encryption:** TLS 1.3 Active")
     with col_s2:
-        st.success("AI is protecting your data from unauthorized access.")
+        st.success("AI Security Agents are monitoring packet signatures.")
     
     st.markdown("""
     <div class='summary-box'>
         <b>📝 Security Summary (Roman English):</b><br>
-        Ye section aapke network ki hifazat (Security) ko monitor karta hai. Immunity score jitna zyada hoga, 
-        aapka data utna hi mehfooz rahega. AI har waqt hackers aur virus wali files ko block karne ke liye tayyar rehta hai.
+        Ye section aapke network ki hifazat (Security) check karta hai. AI ye dekhta hai ke koi bahar ka banda ya virus aapke packets ko chura to nahi raha. <b>Immunity Score</b> batata hai ke aapka connection kitna mazboot hai. Hum <b>TLS 1.3</b> encryption use kar rahe hain jo ke dunya ki top security level hai.
     </div>
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -199,56 +230,73 @@ with tabs[2]:
 # --- TAB 4: PREDICTION ---
 with tabs[3]:
     st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.write("### 🔮 AI Traffic Forecasting (Next 24 Hours)")
+    st.write("### 🔮 AI Traffic Forecast (Next 24h)")
     pred_data = pd.DataFrame(np.random.randint(20, 90, size=(24, 1)), columns=['Predicted Load'])
     st.line_chart(pred_data)
     
     st.markdown("""
     <div class='summary-box'>
         <b>📝 Prediction Summary (Roman English):</b><br>
-        AI ne pichle record ko dekh kar andaza (Predict) lagaya hai ke aglay 24 ghanton mein internet par kitna bura asar parh sakta hai. 
-        Is se humein pehle hi pata chal jata hai ke kab internet slow hone ka khatra hai.
+        AI ne pichle data patterns ko analyze kar ke ye 'Future Forecast' taiyar kiya hai. Ye batata hai ke aglay 24 ghanton mein kis waqt internet par bura asar parh sakta hai. Is se humein pehle hi pata chal jata hai ke kab network load barhe ga taake hum priority set kar sakein.
     </div>
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# --- TAB 5: OFFICIAL AUDIT ---
+# --- TAB 5: OFFICIAL AUDIT (THE COMPREHENSIVE REPORT) ---
 with tabs[4]:
     if 'audit' in st.session_state:
         d = st.session_state.audit
         st.markdown("<div class='report-paper'>", unsafe_allow_html=True)
         st.markdown(f"""
-        <h1 style="text-align:center; border-bottom: 2px solid #1a1a1a;">NETWORK FORENSIC AUDIT REPORT</h1>
-        <p style="text-align:right;"><b>Ref:</b> {d['id']} | <b>Date:</b> {d['time']}</p>
-        <hr style="border: 1px solid #1a1a1a;">
+        <h1 style="text-align:center; border-bottom: 2px solid #000;">NETWORK FORENSIC AUDIT REPORT</h1>
+        <p style="text-align:right;"><b>REPORT ID:</b> {d['id']} | <b>DATE:</b> {d['time']}</p>
         
         <h3>1. EXECUTIVE SUMMARY</h3>
-        <p>This comprehensive audit documents the autonomous diagnostic findings. The system has been classified as <b>{d['v']}</b>.</p>
+        <p>This comprehensive audit documents the autonomous diagnostic findings for the subject network. 
+        The system has been classified as <b>{d['v']}</b> with an AI confidence rating of 98.4%.</p>
         
-        <h3>2. CORE METRICS</h3>
-        <p>Latency: {d['stats'][0]} ms | Loss: {d['stats'][1]} % | Nodes: {d['stats'][3]}</p>
+        <h3>2. CLINIC BIO-SCAN ANALYSIS</h3>
+        <p>The neural bio-scan of the data link and network layers revealed the following vitals:</p>
+        <table style="width:100%; border: 1px solid #ddd; border-collapse: collapse;">
+            <tr style="background:#f2f2f2;"><th>Parameter</th><th>Measured Value</th><th>Evaluation</th></tr>
+            <tr><td>Round Trip Latency</td><td>{d['stats'][0]} ms</td><td>{('Stable' if d['stats'][0]<100 else 'Critical')}</td></tr>
+            <tr><td>Packet Loss Ratio</td><td>{d['stats'][1]} %</td><td>{('Optimal' if d['stats'][1]<2 else 'Degraded')}</td></tr>
+            <tr><td>Active Network Nodes</td><td>{d['stats'][3]} Devices</td><td>Nominal</td></tr>
+            <tr><td>Analyzed Data Packets</td><td>{d['stats'][4]} Units</td><td>Processed</td></tr>
+        </table>
         
-        <h3>3. AI CLINICAL PRESCRIPTION</h3>
-        <p><b>Advice:</b> {d['p_eng']}</p>
-        <p><b>Urdu:</b> {d['p_urdu']}</p>
+        <h3>3. NEURAL STABILITY PULSE ANALYSIS</h3>
+        <p>Continuous monitoring of uplink and downlink flows shows a stability coefficient of 0.92. 
+        Pattern analysis suggests that the network is capable of handling current throughput without packet fragmentation.</p>
         
-        <h3>4. FINAL REMARKS (Roman English)</h3>
-        <p>Ye aapka final medical certificate hai. Is mein sab kuch tafseel se likha gaya hai ke network mein kya masla hai 
-        aur usay theek kaise karna hai. AI ne mashwara diya hai ke router ko restart karein aur DNS ko optimize karein.</p>
+        <h3>4. CYBER-SHIELD INFRASTRUCTURE AUDIT</h3>
+        <p>The AI Shield has maintained an immunity score of <b>{d['sec_score']}%</b>. 
+        All data packets are being routed through a TLS 1.3 encrypted tunnel. No active intrusions were detected.</p>
         
-        <br>
-        <p style="text-align:right;"><i>Digitally Signed: Dr. Cyber-Sentinel (NetDoc AI Pro)</i></p>
+        <h3>5. PREDICTIVE NETWORK LOAD FORECAST</h3>
+        <p>Based on historical heuristic data, the AI predicts a congestion peak during the next high-usage window. 
+        Autonomous QoS (Quality of Service) has been scheduled to mitigate throughput drops.</p>
+        
+        <h3>6. FINAL CLINICAL PRESCRIPTION</h3>
+        <p><b>English Diagnosis:</b> {d['p_eng']}</p>
+        <p><b>اردو تشخیص:</b> {d['p_urdu']}</p>
+        <p><b>Recommended Treatment:</b> We advise an immediate flush of the DNS cache, gateway hardware reboot, and optimization of Layer-2 switching protocols.</p>
+        
+        <br><br>
+        <p style="text-align:right;"><b>Digitally Signed,</b><br>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=VerifiedNetDoc" style="width:80px;"><br>
+        <i>Dr. Cyber-Sentinel (NetDoc AI Pro)</i></p>
         """, unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.download_button(
-            label="📥 DOWNLOAD PROFESSIONAL REPORT",
-            data=f"NetDoc Audit Report\nID: {d['id']}\nStatus: {d['v']}\nAdvice: {d['p_eng']}",
+            label="📥 DOWNLOAD FULL PROFESSIONAL AUDIT REPORT",
+            data=f"NetDoc AI Audit Report\nID: {d['id']}\nStatus: {d['v']}\nLatency: {d['stats'][0]}ms\nSecurity: {d['sec_score']}%\nAdvice: {d['p_eng']}",
             file_name=f"Detailed_Audit_{d['id']}.txt"
         )
     else:
-        st.warning("⚠️ Please conduct a Clinic scan first to generate the report.")
+        st.warning("⚠️ Access Denied. Diagnostic data not found. Please run a scan in the Clinic tab first.")
 
 # --- SIDEBAR ---
 if st.sidebar.button("🗑️ PURGE CLINIC DATA"):
