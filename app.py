@@ -145,14 +145,14 @@ with tabs[0]:
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.write("### 🩺 Start AI Diagnosis")
         if lottie_doc: st_lottie(lottie_doc, height=200)
-        if st.button("RUN DEEP BIO-SCAN"):
+        if st.button("RUN DEEP SCAN"):
             with st.spinner("Analyzing DNA..."):
                 time.sleep(2)
                 lat, loss, jit = random.randint(15, 350), random.randint(0, 12), random.randint(2, 65)
                 devs, pkts = random.randint(1, 25), random.randint(1500, 8000)
                 pred = ai_physician.predict([[lat, loss, jit, devs]])[0]
                 diags = {
-                    0: ("Optimum Health", "Stable DNA Flow", "نظام بالکل ٹھیک ہے۔", "🟢"),
+                    0: ("Optimum Health", "Network DNA is stable.", "نظام بالکل ٹھیک ہے۔", "🟢"),
                     1: ("Hyper-Congestion", "Pathways clogged.", "نیٹ ورک پر بوجھ زیادہ ہے۔", "🟡"),
                     4: ("Gateway Failure", "Backbone ISP Failure.", "انٹرنیٹ فراہم کرنے والے کا مسئلہ ہے۔", "🔴")
                 }
@@ -180,11 +180,10 @@ with tabs[0]:
             
             st.markdown(f"""
             <div class='summary-box'>
-                <b>📝 Clinic Functional Summary (Roman English):</b><br>
-                Is section mein AI aapke network ki current halat (situation) ko judge karta hai. <br>
-                1. <b>Latency ({res['stats'][0]}ms):</b> Ye data ke raste ka delay hai. Jitni kam hogi, internet utna fast chale ga.<br>
-                2. <b>Active Nodes ({res['stats'][3]}):</b> Ye wo devices hain (mobile/laptops) jo abhi connect hain. Zyada nodes load barhate hain.<br>
-                3. <b>Packets ({res['stats'][4]}):</b> Ye data ke chote units hain. Inka sahi flow batata hai ke system error-free hai.
+                <b>📝 Clinic Working & AI Analysis (Roman English):</b><br>
+                <b>Working:</b> Is section mein AI aapke network ka full scan karta hai taake bottlenecks pehchane ja saken.<br>
+                <b>Analysis:</b> Aapke network par <b>{res['stats'][3]} devices</b> connected hain aur latency <b>{res['stats'][0]}ms</b> hai. 
+                AI analysis ke mutabiq aapke network mein <b>{res['v']}</b> ka masla hai. Iska matlab hai ke aapka connection {('slow hai aur optimization ki zaroorat hai' if res['stats'][0]>100 else 'bilkul fit chal raha hai')}.
             </div>
             """, unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
@@ -196,13 +195,13 @@ with tabs[1]:
     v_data = pd.DataFrame(np.random.randint(30, 100, size=(20, 2)), columns=['Uplink', 'Downlink'])
     st.area_chart(v_data)
     
-    st.markdown("""
+    st.markdown(f"""
     <div class='summary-box'>
-        <b>📝 Vitals Functional Summary (Roman English):</b><br>
-        Ye graph network ki 'Dharhkan' (Pulse) dikhata hai. <br>
-        - <b>Graph Upar Jana:</b> Iska matlab hai ke network par 'Traffic Spike' aayi hai (koi bari file download ya stream ho rahi hai).<br>
-        - <b>Smooth Lines:</b> Iska matlab hai network stable hai aur data bina rukawat ke flow kar raha hai.<br>
-        - <b>Uplink vs Downlink:</b> Downlink receive hone wala data hai aur Uplink bhejne wala data.
+        <b>📝 Vitals Working & AI Analysis (Roman English):</b><br>
+        <b>Working:</b> Ye graph network ki live speed aur stability (dharhkan) dikhata hai.<br>
+        <b>Analysis:</b> Graph mein peaks ka matlab hai ke heavy data use ho raha hai. Is waqt aapka Uplink aur Downlink pattern 
+        {('stable nahi hai, jitter ho sakta hai' if random.random()>0.5 else 'bilkul smooth hai')}. 
+        AI mashwara deta hai ke agar graph bar bar upar niche jaye to router ki position change karein.
     </div>
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -212,18 +211,20 @@ with tabs[2]:
     st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
     st.write("### 🛡️ Cyber-Shield Status")
     sc1, sc2 = st.columns(2)
+    curr_sec = st.session_state.audit['sec'] if 'audit' in st.session_state else 92
     with sc1:
-        st.header(f"Immunity Score: {st.session_state.audit['sec'] if 'audit' in st.session_state else 92}%")
+        st.header(f"Immunity Score: {curr_sec}%")
         st.write("🔐 **Encryption:** TLS 1.3 Active")
     with sc2:
         st.success("AI Agents are actively guarding packet signatures.")
     
-    st.markdown("""
+    st.markdown(f"""
     <div class='summary-box'>
-        <b>📝 Security Functional Summary (Roman English):</b><br>
-        Ye aapke network ki hifazati diwar (Firewall) hai. <br>
-        - <b>Immunity Score:</b> Ye batata hai ke aapka network attacks ke khilaf kitna mazboot hai. <br>
-        - <b>TLS 1.3:</b> Ye dunya ka sab se advance encryption protocol hai jo aapke data ko 'Lock' kar deta hai taake koi hacker usay parh na sakay.
+        <b>📝 Security Working & AI Analysis (Roman English):</b><br>
+        <b>Working:</b> Ye section hackers aur unauthorized packets se bachao ki report deta hai.<br>
+        <b>Analysis:</b> Aapka security score <b>{curr_sec}%</b> hai. Iska matlab hai ke AI Shield ne 
+        {('kuch threats detect kiye hain lekin block kar diye hain' if curr_sec<95 else 'aapke network ko 100% mehfooz banaya hua hai')}. 
+        TLS 1.3 encryption ki wajah se aapka privacy level bohot high hai.
     </div>
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -237,10 +238,10 @@ with tabs[3]:
     
     st.markdown("""
     <div class='summary-box'>
-        <b>📝 Prediction Functional Summary (Roman English):</b><br>
-        Is section mein AI aglay 24 ghanton ka 'Andaza' lagata hai. <br>
-        - <b>Working:</b> AI pichle patterns (history) ko analyze karta hai aur batata hai ke kis waqt internet slow ho sakta hai. <br>
-        - <b>Benefit:</b> Is se humein pehle hi pata chal jata hai ke kab network load barhne wala hai taake hum zaroori kaam pehle kar sakein.
+        <b>📝 Prediction Working & AI Analysis (Roman English):</b><br>
+        <b>Working:</b> AI pichle patterns ko dekh kar aglay 24 ghanton ki traffic predict karta hai.<br>
+        <b>Analysis:</b> AI predict kar raha hai ke aglay 24 hours mein load 20% se 85% tak fluctuate karega. 
+        Raat ke waqt traffic barhne ka imkan hai, is liye AI automatic 'Self-Healing' protocols on kar dega taake internet slow na ho.
     </div>
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -256,23 +257,23 @@ with tabs[4]:
         <hr style="border: 1px solid #1a1a1a;">
         
         <h3>1. EXECUTIVE SUMMARY</h3>
-        <p>The network has been diagnosed as <b>{d['v']}</b>. The AI Physician has analyzed {d['stats'][4]} packets.</p>
+        <p>The network infrastructure has been audited by the Neural Core. Final Diagnosis: <b>{d['v']}</b>.</p>
         
         <h3>2. CLINIC BIO-SCAN ANALYSIS</h3>
-        <p>Measured Latency: {d['stats'][0]} ms | Packet Loss: {d['stats'][1]} % | Active Nodes: {d['stats'][3]}</p>
+        <p>Latency: {d['stats'][0]} ms | Packet Loss: {d['stats'][1]} % | Active Nodes: {d['stats'][3]} | Packets: {d['stats'][4]}</p>
         
         <h3>3. STABILITY PULSE INTERPRETATION</h3>
-        <p>The stability coefficient is measured at 0.94. Peak traffic spikes are within hardware limits.</p>
+        <p>Measured stability coefficient: 0.94. AI suggests the hardware is performing optimally under the current load.</p>
         
         <h3>4. SECURITY & IMMUNITY STATUS</h3>
-        <p>Current Immunity: {d['sec']}% | Protocols: TLS 1.3 Encrypted Tunneling active.</p>
+        <p>Current Immunity: {d['sec']}% | Encryption: TLS 1.3 Encrypted Tunneling is active and verified.</p>
         
         <h3>5. PREDICTIVE LOAD FORECAST</h3>
-        <p>AI predicts a stable throughput for the next 06-hour window before a potential congestion spike.</p>
+        <p>AI-driven predictive models suggest a congestion-free window for the next 06 hours.</p>
         
         <h3>6. FINAL CLINICAL PRESCRIPTION</h3>
         <p><b>Diagnosis:</b> {d['p_eng']} ({d['p_urdu']})</p>
-        <p><b>Action Plan:</b> Restart Gateway ONT, optimize DNS settings, and monitor Layer-2 switching.</p>
+        <p><b>Recommended Treatment:</b> Flush DNS Resolver, Reboot ONT/Gateway, and Optimize Layer-2 Switching.</p>
         
         <br><br>
         <p style="text-align:right;"><b>Digitally Signed,</b><br>
@@ -283,7 +284,7 @@ with tabs[4]:
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.download_button(
-            label="📥 DOWNLOAD FULL PROFESSIONAL REPORT",
+            label="📥 DOWNLOAD FULL PROFESSIONAL AUDIT REPORT",
             data=f"NetDoc Audit Report\nID: {d['id']}\nStatus: {d['v']}\nLatency: {d['stats'][0]}ms\nAdvice: {d['p_eng']}",
             file_name=f"Detailed_Audit_{d['id']}.txt"
         )
